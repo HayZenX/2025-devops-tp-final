@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------
+  # 1. Base de Données (PostgreSQL)
+  # ----------------------------------------------------
+  database:
+    image: postgres:15-alpine
+    container_name: christmas-db
+    environment:
+      # Credentials de la base de données
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: christmas_gifts
+    volumes:
+      # Conserve les données de la DB entre les redémarrages
+      - db_data:/var/lib/postgresql/data
+    restart: always
+
+  # ----------------------------------------------------
+  # 2. Backend API (Go)
+  # ----------------------------------------------------
+  backend:
+    # Construit l'image à partir de votre Dockerfile dans ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: christmas-api
+    # 🎯 JONCTION CLÉ : Permet à l'API de se connecter à la DB interne
+    environment:
+      # 'database' est le nom du service DB dans Docker Compose
+      DATABASE_URL: "postgres://postgres:postgres@database:5432/christmas_gifts?sslmode=disable"
+      PORT: 8080
+    # S'assure que la DB démarre avant l'API
+    depends_on:
+      - database
+    restart: always
+
+  # ----------------------------------------------------
+  # 3. Frontend (React/Nginx)
+  # ----------------------------------------------------
+  frontend:
+    # Construit l'image à partir de votre Dockerfile dans ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: christmas-web
+    # 🎯 Mappage finalisé : Hôte 5173 -> Conteneur 5173
+    ports:
+      - "5173:5173"
+    # Le frontend a besoin du backend pour les requêtes /api
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  db_data:

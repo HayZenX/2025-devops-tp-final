@@ -1,0 +1,8 @@
+# render.yaml (à la racine du projet)
+# Ceci sera utilisé pour configurer le proxy du service statique (Frontend)
+
+redirects:
+  - from: /api/*
+    # Remplacer cette URL par l'URL définitive de votre service API Render
+    to: [URL_DU_SERVICE_WEB_API]/api/:splat
+    status: 200
