@@ -4,5 +4,5 @@
 redirects:
   - from: /api/*
     # Remplacer cette URL par l'URL définitive de votre service API Render
-    to: [URL_DU_SERVICE_WEB_API]/api/:splat
+    to: https://tp-final-backend-xxxx.onrender.com/api/:splat
     status: 200
